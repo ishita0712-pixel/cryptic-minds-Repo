@@ -190,7 +190,8 @@
     var cardsHtml = filtered
       .map(function (hospital) {
         var stale = Utils.isStale(hospital.lastUpdated, nowMs);
-        var telHref = "tel:" + String(hospital.contact || "").replace(/[^+\d]/g, "");
+        var contactText = String(hospital.contact || "+91 755-010-0000").trim();
+        var telHref = "tel:" + contactText.replace(/[^+\d]/g, "");
         var totalAvailable =
           Data.getEffectiveBedCount(hospital, "icu", holds) +
           Data.getEffectiveBedCount(hospital, "oxygen", holds) +
@@ -215,7 +216,6 @@
           "      <h3>" + Utils.escapeHtml(hospital.name) + "</h3>" +
           '      <div class="hospital-meta">' +
           "        <span><strong>City:</strong> " + Utils.escapeHtml(hospital.city) + "</span>" +
-          '        <span><strong>Phone:</strong> <a href="' + Utils.escapeHtml(telHref) + '">' + Utils.escapeHtml(hospital.contact) + "</a></span>" +
           "      </div>" +
           "    </div>" +
           '    <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">' +
@@ -224,6 +224,16 @@
             ? '<span class="status-pill status-stale">STALE</span>'
             : '<span class="status-pill ' + overallStatus.className + '">' + overallStatus.label + "</span>") +
           "    </div>" +
+          "  </div>" +
+          '  <div class="hospital-contact-bar">' +
+          '    <div class="hospital-contact-info">' +
+          '      <span class="contact-label">Contact Number (Demo):</span> ' +
+          '      <strong class="contact-number">' + Utils.escapeHtml(contactText) + "</strong>" +
+          "    </div>" +
+          '    <a class="btn btn-outline btn-sm call-hospital-btn" href="' + Utils.escapeHtml(telHref) + '" ' +
+          'aria-label="Call ' + Utils.escapeHtml(hospital.name) + ' at ' + Utils.escapeHtml(contactText) + '">' +
+          "      Call Hospital" +
+          "    </a>" +
           "  </div>" +
           staleHtml +
           '  <div class="bed-boxes-grid">' + bedsHtml + "</div>" +

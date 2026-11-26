@@ -107,7 +107,14 @@
       try {
         var parsed = JSON.parse(raw);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          return parsed.map(function (hospital, index) {
+            if (!hospital.contact || !String(hospital.contact).trim()) {
+              return Object.assign({}, hospital, {
+                contact: "+91 755-010-00" + String(index + 10)
+              });
+            }
+            return hospital;
+          });
         }
       } catch (_err) {
         // Re-seed if storage was corrupted

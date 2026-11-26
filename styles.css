@@ -608,6 +608,43 @@ body {
   text-decoration: underline;
 }
 
+.hospital-contact-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  background-color: var(--blue-soft);
+  border: 1px solid #cce0ff;
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.hospital-contact-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 0.92rem;
+}
+
+.contact-label {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.contact-number {
+  color: var(--blue-dark);
+  font-size: 0.98rem;
+  letter-spacing: 0.01em;
+}
+
+.call-hospital-btn {
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: #ffffff;
+}
+
 .demo-tag {
   display: inline-block;
   background-color: var(--bg-muted);
