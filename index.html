@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediBed – Live Hospital Bed Availability (Demo Prototype)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Persistent Demo Disclaimer Banner -->
+  <div class="demo-banner" role="alert">
+    <div class="container demo-banner-inner">
+      <span class="demo-pill">DEMO PROTOTYPE</span>
+      <p>
+        <strong>DEMO DATA</strong> – Not verified real-time hospital availability. Contact the hospital to confirm.
+      </p>
+    </div>
+  </div>
+
+  <!-- Top Navigation -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#home" class="brand" data-nav="home" aria-label="MediBed Home">
+        <span class="brand-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#0D9488" />
+            <path d="M6 21V13C6 11.8954 6.89543 11 8 11H11V17H24C25.1046 17 26 17.8954 26 19V21" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M6 21V24M26 21V24M6 21H26" stroke="white" stroke-width="2.2" stroke-linecap="round" />
+            <path d="M16 7V13M13 10H19" stroke="#CCFBF1" stroke-width="2.2" stroke-linecap="round" />
+          </svg>
+        </span>
+        <span class="brand-text">
+          <strong>MediBed</strong>
+          <small>Bed Availability Demo</small>
+        </span>
+      </a>
+
+      <nav class="main-nav" aria-label="Primary Navigation">
+        <button type="button" class="nav-btn active" data-nav="home">Home</button>
+        <button type="button" class="nav-btn" data-nav="search">Find Beds</button>
+        <button type="button" class="nav-btn" data-nav="dashboard">Hospital Dashboard</button>
+      </nav>
+
+      <div class="header-actions">
+        <button type="button" id="resetDemoBtn" class="btn btn-ghost btn-sm" title="Restore original fictional demo hospitals">
+          Reset Demo Data
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <!-- Toast Notification -->
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <!-- ==================== HOME VIEW ==================== -->
+    <section id="view-home" class="view active" aria-labelledby="home-heading">
+      <div class="container">
+        <div class="hero-card">
+          <div class="hero-content">
+            <span class="hero-badge">Hackathon Prototype • Local Browser Storage</span>
+            <h1 id="home-heading">Find Hospital Bed Availability in Seconds</h1>
+            <p class="hero-subtitle">
+              MediBed helps patients quickly search nearby demo hospitals by city, compare
+              <strong>ICU</strong>, <strong>Oxygen</strong>, and <strong>General</strong> bed counts,
+              spot outdated availability with automatic <strong>STALE</strong> warnings, and test temporary
+              2-minute demo holds.
+            </p>
+            <div class="hero-actions">
+              <button type="button" class="btn btn-primary btn-lg" data-nav="search">
+                Find Beds
+              </button>
+              <button type="button" class="btn btn-secondary btn-lg" data-nav="dashboard">
+                Hospital Dashboard
+              </button>
+            </div>
+          </div>
+
+          <div class="hero-summary" id="homeSummaryCards">
+            <!-- Populated dynamically from localStorage -->
+          </div>
+        </div>
+
+        <div class="features-grid">
+          <article class="feature-card">
+            <div class="feature-icon feature-icon-blue">1</div>
+            <h3>Search by City &amp; Bed Type</h3>
+            <p>
+              Filter demo hospitals across Bhopal, Indore, Jabalpur, or newly added cities by ICU,
+              Oxygen, or General bed availability.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon feature-icon-teal">2</div>
+            <h3>Live Hospital Updates</h3>
+            <p>
+              Hospitals can add new entries or update bed counts at any time. Every change automatically
+              saves a fresh timestamp.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon feature-icon-amber">3</div>
+            <h3>24-Hour STALE Protection</h3>
+            <p>
+              Any hospital data older than 24 hours automatically shows a prominent STALE warning so
+              patients know to verify directly by phone.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon feature-icon-navy">4</div>
+            <h3>2-Minute Demo Bed Hold</h3>
+            <p>
+              Patients can place a temporary 2-minute demo hold with a live countdown timer that
+              prevents duplicate holds in this browser.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PATIENT SEARCH VIEW ==================== -->
+    <section id="view-search" class="view" aria-labelledby="search-heading" hidden>
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <h2 id="search-heading">Patient Bed Search</h2>
+            <p class="section-subtitle">
+              Search fictional demo hospitals by city and filter by available bed types.
+            </p>
+          </div>
+          <div class="legend-bar" aria-label="Availability Legend">
+            <span class="status-pill status-available">Available (4+)</span>
+            <span class="status-pill status-limited">Limited (1–3)</span>
+            <span class="status-pill status-full">Full (0)</span>
+            <span class="status-pill status-stale">STALE (&gt;24h)</span>
+          </div>
+        </div>
+
+        <!-- Search and Filter Controls -->
+        <div class="filter-panel">
+          <div class="filter-grid">
+            <div class="form-group">
+              <label for="citySearchInput">Search by City or Hospital Name</label>
+              <input
+                type="text"
+                id="citySearchInput"
+                placeholder="e.g., Bhopal, Indore, Jabalpur..."
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="citySelect">Quick City Filter</label>
+              <select id="citySelect">
+                <option value="all">All Cities</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="bedTypeFilter">Filter by Available Bed Type</label>
+              <select id="bedTypeFilter">
+                <option value="all">All Bed Types</option>
+                <option value="icu">ICU Beds Available (&gt; 0)</option>
+                <option value="oxygen">Oxygen Beds Available (&gt; 0)</option>
+                <option value="general">General Beds Available (&gt; 0)</option>
+              </select>
+            </div>
+
+            <div class="filter-actions">
+              <button type="button" id="clearFiltersBtn" class="btn btn-outline">
+                Clear Filters
+              </button>
+            </div>
+          </div>
+
+          <div class="results-meta">
+            <span id="searchResultsCount">Showing 0 hospitals</span>
+            <span id="activeHoldSummary" class="active-hold-summary" hidden></span>
+          </div>
+        </div>
+
+        <!-- Hospital Results Grid -->
+        <div id="hospitalResultsGrid" class="hospital-grid"></div>
+
+        <!-- Empty State -->
+        <div id="noResultsMessage" class="empty-state" hidden>
+          <h3>No matching hospitals found</h3>
+          <p>
+            No demo hospitals match your current city search or bed filter. Try another city or clear
+            your filters.
+          </p>
+          <button type="button" id="emptyClearFiltersBtn" class="btn btn-primary">
+            Show All Demo Hospitals
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== HOSPITAL DASHBOARD VIEW ==================== -->
+    <section id="view-dashboard" class="view" aria-labelledby="dashboard-heading" hidden>
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <h2 id="dashboard-heading">Hospital Staff Dashboard</h2>
+            <p class="section-subtitle">
+              Add a new demo hospital or update ICU, Oxygen, and General bed counts. Every save
+              records a new timestamp and updates Patient Search immediately.
+            </p>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Update Existing Hospital Form -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3>Update Existing Hospital</h3>
+              <span class="panel-tag">Updates Timestamp Automatically</span>
+            </div>
+
+            <form id="updateHospitalForm" novalidate>
+              <div class="form-group">
+                <label for="selectHospital">Select Hospital to Update</label>
+                <select id="selectHospital" required></select>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="updateName">Hospital Name</label>
+                  <input type="text" id="updateName" required />
+                </div>
+                <div class="form-group">
+                  <label for="updateCity">City</label>
+                  <input type="text" id="updateCity" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="updateContact">Contact Number</label>
+                <input type="text" id="updateContact" required />
+              </div>
+
+              <div class="beds-input-grid">
+                <div class="form-group">
+                  <label for="updateIcu">ICU Beds</label>
+                  <input type="number" id="updateIcu" min="0" step="1" required />
+                </div>
+                <div class="form-group">
+                  <label for="updateOxygen">Oxygen Beds</label>
+                  <input type="number" id="updateOxygen" min="0" step="1" required />
+                </div>
+                <div class="form-group">
+                  <label for="updateGeneral">General Beds</label>
+                  <input type="number" id="updateGeneral" min="0" step="1" required />
+                </div>
+              </div>
+
+              <p id="updateFormError" class="form-error" role="alert" hidden></p>
+              <p id="updateCurrentMeta" class="form-helper"></p>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Bed Update</button>
+                <button type="button" class="btn btn-outline" data-nav="search">
+                  View in Patient Search
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Add New Hospital Form -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3>Add New Demo Hospital</h3>
+              <span class="panel-tag panel-tag-teal">Adds to Search &amp; Storage</span>
+            </div>
+
+            <form id="addHospitalForm" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="addName">Hospital Name</label>
+                  <input
+                    type="text"
+                    id="addName"
+                    placeholder="e.g., Demo Sunrise Care Hospital"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="addCity">City</label>
+                  <input type="text" id="addCity" placeholder="e.g., Bhopal" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="addContact">Contact Number</label>
+                <input
+                  type="text"
+                  id="addContact"
+                  placeholder="e.g., +91 755-010-9900"
+                  required
+                />
+              </div>
+
+              <div class="beds-input-grid">
+                <div class="form-group">
+                  <label for="addIcu">ICU Beds</label>
+                  <input type="number" id="addIcu" min="0" step="1" value="0" required />
+                </div>
+                <div class="form-group">
+                  <label for="addOxygen">Oxygen Beds</label>
+                  <input type="number" id="addOxygen" min="0" step="1" value="0" required />
+                </div>
+                <div class="form-group">
+                  <label for="addGeneral">General Beds</label>
+                  <input type="number" id="addGeneral" min="0" step="1" value="0" required />
+                </div>
+              </div>
+
+              <p id="addFormError" class="form-error" role="alert" hidden></p>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-secondary">Add Hospital</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Live Inventory Table -->
+        <div class="panel-card table-panel">
+          <div class="panel-header">
+            <h3>Current Stored Demo Hospitals</h3>
+            <span class="panel-tag">Synced via localStorage</span>
+          </div>
+          <div class="table-wrapper">
+            <table class="inventory-table">
+              <thead>
+                <tr>
+                  <th>Hospital (Demo)</th>
+                  <th>City</th>
+                  <th>Contact</th>
+                  <th>ICU</th>
+                  <th>Oxygen</th>
+                  <th>General</th>
+                  <th>Last Updated</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>
+        <strong>MediBed</strong> – College Hackathon Prototype •
+        <strong>DEMO DATA</strong> – Not verified real-time hospital availability. Contact the hospital to confirm.
+      </p>
+    </div>
+  </footer>
+
+  <script src="utils.js"></script>
+  <script src="data.js"></script>
+  <script src="patient.js"></script>
+  <script src="hospital.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
